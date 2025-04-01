@@ -46,7 +46,7 @@ func Login(username, password string) *structures.JSONMessage {
 		return &structures.JSONMessage{Status: http.StatusBadRequest, Message: "Wrong Password"}
 	}
 
-	refreshToken, token, err := tokenService.GenerateTokens(user.Id)
+	refreshToken, token, err := tokenService.GenerateTokens(user.Id, true)
 
 	return &structures.JSONMessage{Status: http.StatusOK, Message: "Login", Token: token, RefreshToken: refreshToken}
 }
@@ -78,7 +78,7 @@ func Register(username string, password string) *structures.JSONMessage {
 		return &structures.JSONMessage{Status: http.StatusInternalServerError, Message: "Something went wrong"}
 	}
 
-	refreshToken, token, err := tokenService.GenerateTokens(id.String())
+	refreshToken, token, err := tokenService.GenerateTokens(id.String(), true)
 	if err != nil {
 		return &structures.JSONMessage{Status: http.StatusInternalServerError, Message: "Create token error"}
 	}

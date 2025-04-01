@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // Максимальный размер загружаемого файла(аватарки)
@@ -80,6 +81,25 @@ func readFile() (*structures.JSONMessage, error) {
 	return &structures.JSONMessage{Status: http.StatusOK}, nil
 }
 
+func getExtFile() (string, error) {
+	files, err := os.ReadDir("./uploads/" + userId + "/avatar")
+
+	if err != nil {
+		log.Println(err.Error())
+		return "", err
+	}
+
+	var ext string
+
+	for _, file := range files {
+		fileName := file.Name()
+		ext = strings.TrimPrefix(fileName, filepath.Ext(fileName))
+	}
+
+	return ext, nil
+
+}
+
 func saveFile(r *http.Request) (*structures.JSONMessage, error) {
 
 	var b bool
@@ -90,9 +110,19 @@ func saveFile(r *http.Request) (*structures.JSONMessage, error) {
 	}
 
 	if b {
-		filePathAvatar := filepath.Join(os.Getenv("VOLUME_USER_FILES")+"/"+userId+"/avatar", userId, ".any_extension")
-		err := os.Remove(filePathAvatar)
+
+		ext, err := getExtFile()
 		if err != nil {
+			log.Println(err.Error())
+			return &structures.JSONMessage{Status: http.StatusInternalServerError, Message: "Invalid ext operation"}, err
+		}
+
+		filePathAvatar := filepath.Join(os.Getenv("VOLUME_USER_FILES") + "/" + userId + "/avatar" + "/" + ext)
+
+		err = os.Remove(filePathAvatar)
+
+		if err != nil {
+			log.Println(err.Error())
 			return &structures.JSONMessage{Status: http.StatusInternalServerError, Message: "Error while removing the file"}, e
 		}
 		log.Println("File removed")
