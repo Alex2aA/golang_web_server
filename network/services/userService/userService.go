@@ -4,9 +4,9 @@ import (
 	"context"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
-	"idk_web_server001/network"
-	"idk_web_server001/network/services/tokenService"
-	"idk_web_server001/structures"
+	"golang_web_server/network"
+	"golang_web_server/network/services/tokenService"
+	"golang_web_server/structures"
 	"log"
 	"net/http"
 )

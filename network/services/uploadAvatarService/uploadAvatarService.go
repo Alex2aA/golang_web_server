@@ -3,8 +3,8 @@ package uploadAvatarService
 import (
 	"errors"
 	"fmt"
-	"idk_web_server001/helpers"
-	"idk_web_server001/structures"
+	"golang_web_server/helpers"
+	"golang_web_server/structures"
 	"io"
 	"log"
 	"mime/multipart"

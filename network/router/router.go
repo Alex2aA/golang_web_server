@@ -2,9 +2,9 @@ package router
 
 import (
 	"github.com/gorilla/mux"
-	"idk_web_server001/middlewares/auth"
-	"idk_web_server001/network/httpHandlers"
-	"idk_web_server001/network/httpHandlers/userHandler"
+	"golang_web_server/middlewares/auth"
+	"golang_web_server/network/httpHandlers"
+	"golang_web_server/network/httpHandlers/userHandler"
 )
 
 func SetupRouter() *mux.Router {

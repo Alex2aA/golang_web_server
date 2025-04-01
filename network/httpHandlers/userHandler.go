@@ -3,9 +3,9 @@ package httpHandlers
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
-	"idk_web_server001/network/services/uploadAvatarService"
-	"idk_web_server001/network/services/userService"
-	"idk_web_server001/structures"
+	"golang_web_server/network/services/uploadAvatarService"
+	"golang_web_server/network/services/userService"
+	"golang_web_server/structures"
 	"log"
 	"net/http"
 )
