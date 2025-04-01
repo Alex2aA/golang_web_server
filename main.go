@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/joho/godotenv"
-	"golang_web_server/network"
-	"golang_web_server/network/router"
+	"idk_web_server001/network"
+	"idk_web_server001/network/router"
 	"log"
 	"net/http"
 	"os"

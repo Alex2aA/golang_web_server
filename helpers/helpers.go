@@ -2,7 +2,7 @@ package helpers
 
 import (
 	"errors"
-	"golang_web_server/structures"
+	"idk_web_server001/structures"
 	"log"
 	"net/http"
 	"os"

@@ -2,7 +2,7 @@ package httpHandlers
 
 import (
 	"encoding/json"
-	"golang_web_server/structures"
+	"idk_web_server001/structures"
 	"log"
 	"net/http"
 )

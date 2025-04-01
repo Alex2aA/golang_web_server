@@ -2,8 +2,8 @@ package httpHandlers
 
 import (
 	"context"
-	"golang_web_server/network"
-	"golang_web_server/structures"
+	"idk_web_server001/network"
+	"idk_web_server001/structures"
 	"log"
 	"net/http"
 )

@@ -3,8 +3,8 @@ package uploadAvatarService
 import (
 	"errors"
 	"fmt"
-	"golang_web_server/helpers"
-	"golang_web_server/structures"
+	"idk_web_server001/helpers"
+	"idk_web_server001/structures"
 	"io"
 	"log"
 	"mime/multipart"
@@ -90,7 +90,8 @@ func saveFile(r *http.Request) (*structures.JSONMessage, error) {
 	}
 
 	if b {
-		err := os.Remove(avatarFilePath)
+		filePathAvatar := filepath.Join(os.Getenv("VOLUME_USER_FILES")+"/"+userId+"/avatar", userId, ".any_extension")
+		err := os.Remove(filePathAvatar)
 		if err != nil {
 			return &structures.JSONMessage{Status: http.StatusInternalServerError, Message: "Error while removing the file"}, e
 		}
@@ -106,8 +107,6 @@ func saveFile(r *http.Request) (*structures.JSONMessage, error) {
 		log.Println("Error creating avatar user directory", err.Error())
 		return &structures.JSONMessage{Status: http.StatusInternalServerError, Message: "Error creating avatar user directory"}, err
 	}
-
-	avatarFilePath := filepath.Join(os.Getenv("VOLUME_USER_FILES")+"/"+userId+"/avatar", newFileName)
 
 	out, err := os.Create(avatarFilePath)
 	if err != nil {

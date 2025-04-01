@@ -1,9 +1,10 @@
 package structures
 
 type JSONMessage struct {
-	Status  int    `json:"status"`
-	Message string `json:"message,omitempty"`
-	Token   string `json:"token,omitempty"`
+	Status       int    `json:"status"`
+	Message      string `json:"message,omitempty"`
+	Token        string `json:"token,omitempty"`
+	RefreshToken string `json:",omitempty"`
 }
 
 type User struct {

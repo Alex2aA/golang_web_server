@@ -4,9 +4,9 @@ import (
 	"context"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
-	"golang_web_server/network"
-	"golang_web_server/network/services/tokenService"
-	"golang_web_server/structures"
+	"idk_web_server001/network"
+	"idk_web_server001/network/services/tokenService"
+	"idk_web_server001/structures"
 	"log"
 	"net/http"
 )
@@ -46,9 +46,9 @@ func Login(username, password string) *structures.JSONMessage {
 		return &structures.JSONMessage{Status: http.StatusBadRequest, Message: "Wrong Password"}
 	}
 
-	token, err := tokenService.CreateToken(user.Id, user.Password)
+	refreshToken, token, err := tokenService.GenerateTokens(user.Id)
 
-	return &structures.JSONMessage{Status: http.StatusOK, Message: "Login", Token: token}
+	return &structures.JSONMessage{Status: http.StatusOK, Message: "Login", Token: token, RefreshToken: refreshToken}
 }
 
 func Register(username string, password string) *structures.JSONMessage {
@@ -78,10 +78,10 @@ func Register(username string, password string) *structures.JSONMessage {
 		return &structures.JSONMessage{Status: http.StatusInternalServerError, Message: "Something went wrong"}
 	}
 
-	token, err := tokenService.CreateToken(id.String(), username)
+	refreshToken, token, err := tokenService.GenerateTokens(id.String())
 	if err != nil {
 		return &structures.JSONMessage{Status: http.StatusInternalServerError, Message: "Create token error"}
 	}
 
-	return &structures.JSONMessage{Status: http.StatusCreated, Message: "User created", Token: token}
+	return &structures.JSONMessage{Status: http.StatusCreated, Message: "User created", Token: token, RefreshToken: refreshToken}
 }
