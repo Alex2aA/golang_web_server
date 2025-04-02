@@ -8,13 +8,16 @@ import (
 	"golang_web_server/structures"
 	"log"
 	"net/http"
+	"os"
 )
 
+// рефактор tokenService
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tokenString := r.Header.Get("Authorization")
-		token, err, expired := tokenService.ParseToken(tokenString)
-		if err != nil && !expired {
+		tokenService := tokenservice.NewTokenService(os.Getenv("SECRET_KEY"))
+		token, err, expired := tokenService.ValidateAccessToken(tokenString)
+		if err != nil {
 			httpHandlers.SendJSONMessage(w, structures.JSONMessage{Status: http.StatusUnauthorized, Message: err.Error()})
 			return
 		}
@@ -28,7 +31,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		}
 
 		token, err, expired = tokenService.ParseToken(tokenString)
-		if err != nil && !expired {
+		if err != nil {
 			httpHandlers.SendJSONMessage(w, structures.JSONMessage{Status: http.StatusUnauthorized, Message: err.Error()})
 			return
 		}
@@ -50,12 +53,6 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			httpHandlers.SendJSONMessage(w, structures.JSONMessage{Status: http.StatusUnauthorized, Message: "Token type data error"})
 			return
 		}
-
-		//username, ok := claims["username"].(string)
-		//if !ok {
-		//	httpHandlers.SendJSONMessage(w, structures.JSONMessage{Status: http.StatusUnauthorized, Message: "Token type data error"})
-		//	return
-		//}
 
 		ctx := context.WithValue(r.Context(), "userId", userId)
 		next.ServeHTTP(w, r.WithContext(ctx))
