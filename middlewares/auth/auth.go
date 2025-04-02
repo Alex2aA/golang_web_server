@@ -2,59 +2,26 @@ package auth
 
 import (
 	"context"
-	"github.com/golang-jwt/jwt/v5"
 	"golang_web_server/network/httpHandlers"
 	"golang_web_server/network/services/tokenService"
 	"golang_web_server/structures"
-	"log"
 	"net/http"
-	"os"
+	"strings"
 )
 
-// рефактор tokenService
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
 		tokenString := r.Header.Get("Authorization")
-		tokenService := tokenservice.NewTokenService(os.Getenv("SECRET_KEY"))
-		token, err, expired := tokenService.ValidateAccessToken(tokenString)
+		tokenString = strings.TrimPrefix(tokenString, "Bearer ")
+		claims, err := tokenService.ParseToken(tokenString)
+
 		if err != nil {
 			httpHandlers.SendJSONMessage(w, structures.JSONMessage{Status: http.StatusUnauthorized, Message: err.Error()})
 			return
 		}
 
-		if expired {
-			tokenString, err = httpHandlers.RefreshHandler(w, r)
-			if err != nil {
-				httpHandlers.SendJSONMessage(w, structures.JSONMessage{Status: http.StatusUnauthorized, Message: err.Error()})
-				return
-			}
-		}
-
-		token, err, expired = tokenService.ParseToken(tokenString)
-		if err != nil {
-			httpHandlers.SendJSONMessage(w, structures.JSONMessage{Status: http.StatusUnauthorized, Message: err.Error()})
-			return
-		}
-
-		if err != nil {
-			httpHandlers.SendJSONMessage(w, structures.JSONMessage{Status: http.StatusInternalServerError, Message: err.Error()})
-			log.Println(err.Error())
-			return
-		}
-
-		claims, ok := token.Claims.(jwt.MapClaims)
-		if !ok {
-			httpHandlers.SendJSONMessage(w, structures.JSONMessage{Status: http.StatusUnauthorized, Message: "Token cast error"})
-			return
-		}
-
-		userId, ok := claims["user_id"].(string)
-		if !ok {
-			httpHandlers.SendJSONMessage(w, structures.JSONMessage{Status: http.StatusUnauthorized, Message: "Token type data error"})
-			return
-		}
-
-		ctx := context.WithValue(r.Context(), "userId", userId)
+		ctx := context.WithValue(r.Context(), "userId", claims.UserId)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

@@ -1,5 +1,7 @@
 package structures
 
+import "github.com/golang-jwt/jwt/v5"
+
 type JSONMessage struct {
 	Status       int    `json:"status"`
 	Message      string `json:"message,omitempty"`
@@ -16,4 +18,10 @@ type User struct {
 type OptsFile struct {
 	IsAvatar bool `json:"IsAvatar,omitempty"`
 	IsImage  bool `json:"IsImage,omitempty"`
+}
+
+type TokenClaims struct {
+	UserId    string `json:"userId"`
+	BlackList bool   `json:"blackList"`
+	jwt.RegisteredClaims
 }

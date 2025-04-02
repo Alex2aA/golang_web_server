@@ -35,7 +35,7 @@ func searchUser(username string) (*structures.User, error) {
 func Login(username, password string) *structures.JSONMessage {
 	user, err := searchUser(username)
 	if err != nil {
-		return &structures.JSONMessage{Status: http.StatusInternalServerError, Message: "Something went wrong"}
+		return &structures.JSONMessage{Status: http.StatusInternalServerError, Message: err.Error()}
 	}
 	if user.Id == "" {
 		return &structures.JSONMessage{Status: http.StatusUnauthorized, Message: "User " + username + " not found"}
@@ -43,18 +43,26 @@ func Login(username, password string) *structures.JSONMessage {
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 
 	if err != nil {
-		return &structures.JSONMessage{Status: http.StatusBadRequest, Message: "Wrong Password"}
+		return &structures.JSONMessage{Status: http.StatusBadRequest, Message: err.Error()}
 	}
 
-	refreshToken, token, err := tokenService.GenerateTokens(user.Id, true)
+	refreshTokenString, err := tokenService.GenerateRefreshToken(user.Id)
+	if err != nil {
+		return &structures.JSONMessage{Status: http.StatusInternalServerError, Message: err.Error()}
+	}
 
-	return &structures.JSONMessage{Status: http.StatusOK, Message: "Login", Token: token, RefreshToken: refreshToken}
+	tokenString, err := tokenService.GenerateAccessToken(user.Id)
+	if err != nil {
+		return &structures.JSONMessage{Status: http.StatusInternalServerError, Message: err.Error()}
+	}
+
+	return &structures.JSONMessage{Status: http.StatusOK, Message: "Login", Token: tokenString, RefreshToken: refreshTokenString}
 }
 
 func Register(username string, password string) *structures.JSONMessage {
 	user, err := searchUser(username)
 	if err != nil {
-		return &structures.JSONMessage{Status: http.StatusInternalServerError, Message: "Something went wrong"}
+		return &structures.JSONMessage{Status: http.StatusInternalServerError, Message: err.Error()}
 	}
 	if user.Id != "" {
 		return &structures.JSONMessage{Status: http.StatusConflict, Message: "User already exists"}
@@ -63,25 +71,30 @@ func Register(username string, password string) *structures.JSONMessage {
 
 	if err != nil {
 		log.Println(err.Error())
-		return &structures.JSONMessage{Status: http.StatusInternalServerError, Message: "Something went wrong"}
+		return &structures.JSONMessage{Status: http.StatusInternalServerError, Message: err.Error()}
 	}
 
 	hashPassword, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 
 	if err != nil {
 		log.Println(err.Error())
-		return &structures.JSONMessage{Status: http.StatusInternalServerError, Message: "Something went wrong"}
+		return &structures.JSONMessage{Status: http.StatusInternalServerError, Message: err.Error()}
 	}
 	_, err = network.Pool.Exec(context.Background(), "INSERT INTO users (id, username, hash_password) VALUES ($1, $2, $3)", id.String(), username, hashPassword)
 	if err != nil {
 		log.Println(err.Error())
-		return &structures.JSONMessage{Status: http.StatusInternalServerError, Message: "Something went wrong"}
+		return &structures.JSONMessage{Status: http.StatusInternalServerError, Message: err.Error()}
 	}
 
-	refreshToken, token, err := tokenService.GenerateTokens(id.String(), true)
+	refreshTokenString, err := tokenService.GenerateRefreshToken(id.String())
 	if err != nil {
-		return &structures.JSONMessage{Status: http.StatusInternalServerError, Message: "Create token error"}
+		return &structures.JSONMessage{Status: http.StatusInternalServerError, Message: err.Error()}
 	}
 
-	return &structures.JSONMessage{Status: http.StatusCreated, Message: "User created", Token: token, RefreshToken: refreshToken}
+	tokenString, err := tokenService.GenerateAccessToken(id.String())
+	if err != nil {
+		return &structures.JSONMessage{Status: http.StatusInternalServerError, Message: err.Error()}
+	}
+
+	return &structures.JSONMessage{Status: http.StatusOK, Message: "Login", Token: tokenString, RefreshToken: refreshTokenString}
 }

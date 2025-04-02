@@ -1,4 +1,4 @@
-package userHandler
+package userController
 
 import (
 	"encoding/json"
