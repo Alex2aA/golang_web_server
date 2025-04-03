@@ -99,6 +99,33 @@ func GetRefreshToken(userId string) (string, error) {
 
 }
 
+func CheckTokenBlackList(tokenString string) (bool, error) {
+	rows, err := network.Pool.Query(context.Background(), "SELECT * FROM blacklist_tokens WHERE token = $1", tokenString)
+	if err != nil {
+		return false, err
+	}
+	defer rows.Close()
+	var blackListToken string
+	for rows.Next() {
+		err = rows.Scan(&blackListToken)
+		if err != nil {
+			return false, err
+		}
+	}
+	if blackListToken != "" {
+		return true, fmt.Errorf("Token is blacklisted")
+	}
+	return false, nil
+}
+
+func AddTokenBlackList(tokenString string) error {
+	_, err := network.Pool.Exec(context.Background(), "INSERT INTO blacklist_tokens (token) VALUES ($1)", tokenString)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func Register(username string, password string) *structures.JSONMessage {
 	user, err := searchUserByName(username)
 	if err != nil {
@@ -125,13 +152,16 @@ func Register(username string, password string) *structures.JSONMessage {
 	if err != nil {
 		return &structures.JSONMessage{Status: http.StatusInternalServerError, Message: err.Error()}
 	}
+
 	_, err = network.Pool.Exec(context.Background(), "INSERT INTO users (id, username, hash_password, refresh_token) VALUES ($1, $2, $3, $4)", id.String(), username, hashPassword, refreshToken)
+
 	if err != nil {
 		log.Println(err.Error())
 		return &structures.JSONMessage{Status: http.StatusInternalServerError, Message: err.Error()}
 	}
 
 	tokenString, err := tokenService.GenerateAccessToken(id.String())
+
 	if err != nil {
 		return &structures.JSONMessage{Status: http.StatusInternalServerError, Message: err.Error()}
 	}
