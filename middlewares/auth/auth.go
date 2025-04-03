@@ -21,6 +21,8 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
+		httpHandlers.SendJSONMessage(w, structures.JSONMessage{Status: http.StatusOK, Message: "Token ok", Token: tokenString})
+
 		ctx := context.WithValue(r.Context(), "userId", claims.UserId)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
