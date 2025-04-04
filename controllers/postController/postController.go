@@ -20,7 +20,6 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	}
 	userId, ok := r.Context().Value("userId").(string)
 	if !ok {
-		log.Println(err.Error())
 		httpHandlers.SendJSONMessage(w, structures.JSONMessage{Status: http.StatusInternalServerError, Message: "userId required"})
 		return
 	}
@@ -31,4 +30,18 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	httpHandlers.SendJSONMessage(w, structures.JSONMessage{Status: result.Status, Message: result.Message})
+}
+
+func GetMyPostes(w http.ResponseWriter, r *http.Request) {
+	userId, ok := r.Context().Value("userId").(string)
+	if !ok {
+		httpHandlers.SendJSONMessage(w, structures.JSONMessage{Status: http.StatusInternalServerError, Message: "userId required"})
+		return
+	}
+	result, err := postService.GetMyPostes(userId)
+	if err != nil {
+		httpHandlers.SendJSONMessage(w, structures.JSONMessage{Status: http.StatusInternalServerError, Message: err.Error()})
+		return
+	}
+	httpHandlers.SendJSONMessage(w, structures.JSONMessage{Status: http.StatusOK, Message: "Get postes", Postes: result})
 }

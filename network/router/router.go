@@ -25,6 +25,7 @@ func SetupRouter() *mux.Router {
 	post := api.PathPrefix("/post").Subrouter()
 	post.Use(auth.AuthMiddleware)
 	post.HandleFunc("/create_post", postController.CreatePost).Methods("POST")
+	post.HandleFunc("/get_my_postes", postController.GetMyPostes).Methods("GET")
 
 	//http.Handle("/avatars/", http.StripPrefix("/avatars/", http.FileServer(http.Dir(os.Getenv("UPLOAD_AVATARS_PATH")))))
 

@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	accessTokenExp  = time.Second * 30
-	refreshTokenExp = time.Minute * 2
+	accessTokenExp  = time.Minute * 15
+	refreshTokenExp = time.Hour * 2
 )
 
 // ------------- Generate Tokens -------------
