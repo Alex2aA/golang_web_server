@@ -75,7 +75,10 @@ func generateTokenWRT(claims *structures.TokenClaims) (string, error) {
 	)
 
 	if isExpired(refreshToken, err) {
-		userService.AddTokenBlackList(refreshTokenString)
+		err = userService.AddTokenBlackList(refreshTokenString)
+		if err != nil {
+			return "", err
+		}
 		return "", errors.New("refresh token is expired")
 	}
 

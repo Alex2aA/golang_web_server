@@ -15,6 +15,13 @@ type User struct {
 	RefreshToken string `json:"refreshToken,omitempty"`
 }
 
+type Post struct {
+	Id          string `json:"id,omitempty"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Text        string `json:"text"`
+}
+
 type OptsFile struct {
 	IsAvatar bool `json:"IsAvatar,omitempty"`
 	IsImage  bool `json:"IsImage,omitempty"`
