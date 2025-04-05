@@ -41,9 +41,10 @@ func GetPost(w http.ResponseWriter, r *http.Request) {
 	var postId struct {
 		PostId string `json:"post_id"`
 	}
-	err := json.NewDecoder(r.Body).Decode(&postId.PostId)
+	err := json.NewDecoder(r.Body).Decode(&postId)
 	defer r.Body.Close()
 	if err != nil {
+		log.Println(err.Error())
 		httpHandlers.SendJSONMessage(w, structures.JSONMessage{Status: http.StatusBadRequest, Message: "Bad Request"})
 		return
 	}
@@ -52,7 +53,7 @@ func GetPost(w http.ResponseWriter, r *http.Request) {
 		httpHandlers.SendJSONMessage(w, structures.JSONMessage{Status: http.StatusNotFound, Message: err.Error()})
 		return
 	}
-	httpHandlers.SendJSONMessage(w, structures.JSONMessage{Status: http.StatusOK, Post: post})
+	httpHandlers.SendJSONMessage(w, structures.JSONMessage{Status: http.StatusOK, Post: &post})
 }
 
 func GetMyPostes(w http.ResponseWriter, r *http.Request) {

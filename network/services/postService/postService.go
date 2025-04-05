@@ -31,24 +31,15 @@ func GetMyPostes(userId string) ([]structures.Post, error) {
 	return postes, nil
 }
 
-func getComments(postId string) ([]struct {
-	userId string
-	text   string
-}, error) {
-	rows, err := network.Pool.Query(context.Background(), "SELECT user_id, text FROM comments where post_id = $1", postId)
-	var comments []struct {
-		userId string
-		text   string
-	}
+func getComments(postId string) ([]structures.Comments, error) {
+	rows, err := network.Pool.Query(context.Background(), "SELECT user_id, text FROM comments_postes where post_id = $1", postId)
+	var comments []structures.Comments
 	if err != nil {
 		return comments, err
 	}
 	for rows.Next() {
-		var comment = struct {
-			userId string
-			text   string
-		}{}
-		err = rows.Scan(&comment.userId, &comment.text)
+		var comment structures.Comments
+		err = rows.Scan(&comment.UserId, &comment.Text)
 		if err != nil {
 			return comments, err
 		}
@@ -58,9 +49,22 @@ func getComments(postId string) ([]struct {
 }
 
 func GetPost(userId string, postId string) (structures.Post, error) {
-	row := network.Pool.QueryRow(context.Background(), "SELECT * FROM postes WHERE post_id = $1", postId)
+	row := network.Pool.QueryRow(context.Background(), "SELECT name, description, text FROM postes WHERE id = $1", postId)
 	var post structures.Post
-	println(row)
+	err := row.Scan(&post.Name, &post.Description, &post.Text)
+
+	if err != nil {
+		return post, err
+	}
+
+	comments, err := getComments(postId)
+
+	if err != nil {
+		return post, err
+	}
+
+	post.Comments = comments
+
 	return post, nil
 }
 

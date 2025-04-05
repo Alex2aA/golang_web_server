@@ -6,7 +6,7 @@ type JSONMessage struct {
 	Status  int    `json:"status"`
 	Message string `json:"message,omitempty"`
 	Token   string `json:"token,omitempty"`
-	Post    Post   `json:"post,omitempty"`
+	Post    *Post  `json:"post,omitempty"`
 	Postes  []Post `json:"postes,omitempty"`
 }
 
@@ -18,11 +18,17 @@ type User struct {
 }
 
 type Post struct {
-	Id          string `json:"id,omitempty"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Text        string `json:"text"`
-	UserId      string `json:"userId,omitempty"`
+	Id          string     `json:"id,omitempty"`
+	Name        string     `json:"name"`
+	Description string     `json:"description"`
+	Text        string     `json:"text"`
+	UserId      string     `json:"userId,omitempty"`
+	Comments    []Comments `json:"comments,omitempty"`
+}
+
+type Comments struct {
+	UserId string `json:"user_id"`
+	Text   string `json:"text"`
 }
 
 type OptsFile struct {
