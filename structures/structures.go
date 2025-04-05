@@ -6,6 +6,7 @@ type JSONMessage struct {
 	Status  int    `json:"status"`
 	Message string `json:"message,omitempty"`
 	Token   string `json:"token,omitempty"`
+	Post    Post   `json:"post,omitempty"`
 	Postes  []Post `json:"postes,omitempty"`
 }
 
